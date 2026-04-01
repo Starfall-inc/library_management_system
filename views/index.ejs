@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Library System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 flex min-h-screen">
+    <%- include('partials/sidebar') %>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-8">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
+                <p class="text-gray-500 mt-1">Welcome back, <span class="font-semibold text-black"><%= user.username %></span></p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-3 px-4 py-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm font-medium text-gray-700">System Online</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            <!-- Total Books -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-book text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Books</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-1"><%= stats.totalBooks %></p>
+            </div>
+
+            <!-- Total Members -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Members</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-1"><%= stats.totalMembers %></p>
+            </div>
+
+            <!-- Active Borrows -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Active Borrows</h3>
+                <p class="text-3xl font-bold text-gray-900 mt-1"><%= stats.totalBorrows %></p>
+            </div>
+        </div>
+
+        <!-- Quality of Life Features -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Recent Activity -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-history mr-3 text-gray-400"></i>
+                    Recent Borrowings
+                </h2>
+                <div class="space-y-4">
+                    <% recentActivity.forEach(act => { %>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-gray-400 shadow-sm border border-gray-100">
+                                    <i class="fas fa-book-reader"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900"><%= act.book_title %></p>
+                                    <p class="text-xs text-gray-500">Borrowed by <span class="font-medium text-black"><%= act.member_name %></span></p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400"><%= act.borrow_date %></span>
+                        </div>
+                    <% }); %>
+                    <% if (recentActivity.length === 0) { %>
+                        <p class="text-gray-400 text-sm italic text-center py-4">No recent activity.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Quick Book Info Lookup -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-search-plus mr-3 text-gray-400"></i>
+                    Quick Book Lookup
+                </h2>
+                <div class="relative mb-6">
+                    <input type="text" id="dashboard-book-search" placeholder="Enter book title..." 
+                        class="w-full pl-4 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+                <div id="book-info-result" class="hidden animate-fadeIn">
+                    <div class="p-6 border border-gray-100 rounded-2xl bg-gray-50">
+                        <h4 id="result-title" class="font-bold text-gray-900 text-lg"></h4>
+                        <p id="result-author" class="text-gray-500 text-sm"></p>
+                        <div class="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold">ISBN</p>
+                                <p id="result-isbn" class="text-xs font-mono text-gray-700"></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold">In Stock</p>
+                                <p id="result-stock" class="text-xs font-bold text-gray-700"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p id="no-result-msg" class="text-gray-400 text-sm italic text-center py-4">Start typing to search for books...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const allBooks = <%- JSON.stringify(allBooks) %>;
+        const searchInput = document.getElementById('dashboard-book-search');
+        const resultCard = document.getElementById('book-info-result');
+        const noResultMsg = document.getElementById('no-result-msg');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (query.length < 2) {
+                resultCard.classList.add('hidden');
+                noResultMsg.classList.remove('hidden');
+                noResultMsg.innerText = "Start typing to search for books...";
+                return;
+            }
+
+            const book = allBooks.find(b => b.title.toLowerCase().includes(query));
+            if (book) {
+                document.getElementById('result-title').innerText = book.title;
+                document.getElementById('result-author').innerText = "By " + book.author;
+                document.getElementById('result-isbn').innerText = book.isbn;
+                document.getElementById('result-stock').innerText = book.available_copies + " copies";
+                
+                resultCard.classList.remove('hidden');
+                noResultMsg.classList.add('hidden');
+            } else {
+                resultCard.classList.add('hidden');
+                noResultMsg.classList.remove('hidden');
+                noResultMsg.innerText = "No book found with that title.";
+            }
+        });
+    </script>
+    </main>
+</body>
+</html>

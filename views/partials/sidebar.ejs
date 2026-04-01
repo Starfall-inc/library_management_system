@@ -1,0 +1,88 @@
+<!-- Sidebar Partial -->
+<aside id="sidebar" class="bg-black text-white w-64 min-h-screen flex flex-col transition-all duration-300 ease-in-out sticky top-0 overflow-hidden shadow-xl">
+    <div class="p-6 flex items-center justify-between border-b border-gray-800">
+        <span class="font-bold text-lg tracking-wider uppercase sidebar-text whitespace-nowrap">Library Admin</span>
+        <button id="sidebar-toggle" class="text-white hover:text-gray-400 focus:outline-none transition-colors">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+    
+    <nav class="flex-grow py-6">
+        <ul class="space-y-1">
+            <li>
+                <a href="/" class="flex items-center px-6 py-4 hover:bg-gray-900 transition-colors group">
+                    <i class="fas fa-th-large w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/books" class="flex items-center px-6 py-4 hover:bg-gray-900 transition-colors group">
+                    <i class="fas fa-book w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Books</span>
+                </a>
+            </li>
+            <li>
+                <a href="/members" class="flex items-center px-6 py-4 hover:bg-gray-900 transition-colors group">
+                    <i class="fas fa-users w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Members</span>
+                </a>
+            </li>
+            <li>
+                <a href="/borrowing" class="flex items-center px-6 py-4 hover:bg-gray-900 transition-colors group">
+                    <i class="fas fa-exchange-alt w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Borrowing</span>
+                </a>
+            </li>
+            <li>
+                <a href="/settings" class="nav-link flex items-center px-6 py-4 hover:bg-gray-900 transition-colors group">
+                    <i class="fas fa-cog w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Settings</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="p-6 border-t border-gray-800">
+        <a href="/logout" class="flex items-center text-gray-400 hover:text-white transition-colors group">
+            <i class="fas fa-sign-out-alt w-6 text-center group-hover:translate-x-1 transition-transform"></i>
+            <span class="ml-4 font-medium sidebar-text whitespace-nowrap">Sign Out</span>
+        </a>
+    </div>
+</aside>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const sidebarTexts = document.querySelectorAll('.sidebar-text');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Active state
+    const currentPath = window.location.pathname;
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('bg-gray-900', 'border-r-4', 'border-white');
+        }
+    });
+
+    function updateSidebar(collapsed) {
+        if (collapsed) {
+            sidebar.classList.remove('w-64');
+            sidebar.classList.add('w-20');
+            sidebarTexts.forEach(text => text.classList.add('hidden'));
+        } else {
+            sidebar.classList.remove('w-20');
+            sidebar.classList.add('w-64');
+            sidebarTexts.forEach(text => text.classList.remove('hidden'));
+        }
+    }
+
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        updateSidebar(true);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        const isCollapsed = sidebar.classList.contains('w-20');
+        updateSidebar(!isCollapsed);
+        localStorage.setItem('sidebar-collapsed', !isCollapsed);
+    });
+</script>
