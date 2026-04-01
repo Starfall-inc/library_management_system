@@ -1,16 +1,18 @@
-# Build stage for native modules
-FROM node:18-slim AS builder
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+FROM node:18-slim
+
+RUN apt-get update && apt-get install -y \
+    python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --omit=dev
 
-# Production stage
-FROM node:18-slim
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
+# Force sqlite3 to compile from source instead of downloading a prebuilt binary
+RUN npm_config_build_from_source=true npm install --omit=dev
+
 COPY . .
+
 EXPOSE 3000
 ENV PORT=3000
 ENV NODE_ENV=production
-CMD ["npm", "run dev"]
+CMD ["npm", "run", "dev"]
