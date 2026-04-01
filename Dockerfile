@@ -1,27 +1,16 @@
-# Use Node.js 22 (Bookworm)
-FROM node:22-bookworm-slim
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install build dependencies for sqlite3 (if needed)
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy package files
+# Build stage for native modules
+FROM node:18-slim AS builder
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 COPY package*.json ./
+RUN npm install --omit=dev
 
-# Install dependencies
-RUN npm install
-
-# Copy app source
+# Production stage
+FROM node:18-slim
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
 COPY . .
-
-# Expose port
 EXPOSE 3000
-
-# Start command
-CMD [ "npm", "run", "dev" ]
+ENV PORT=3000
+ENV NODE_ENV=production
+CMD ["npm", "run dev"]
